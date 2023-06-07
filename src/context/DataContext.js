@@ -1,19 +1,13 @@
-import Home from "./Home";
-import NewPost from "./NewPost";
-import PostPage from "./PostPage";
-import Missing from "./Missing";
-import { Route, Routes, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
-import About from "./About";
-import Layout from "./layout";
+import { createContext, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
-import api from "./api/post";
-import EditPost from "./editPost";
-import useWindowSize from "./hooks/useWindowSize";
-import useAxiosFetch from "./hooks/useAxiosFetch";
-import { DataProvider } from "./context/DataContext";
+import api from "../api/post";
+import useWindowSize from "../hooks/useWindowSize";
+import useAxiosFetch from "../hooks/useAxiosFetch";
 
-function App() {
+const DataContext = createContext({});
+
+export const DataProvider = ({ children }) => {
   const Navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [searchResults, setSearchResults] = useState([]);
@@ -104,22 +98,21 @@ function App() {
       console.log(`Error: ${err.message}`);
     }
   };
-  return (
-    <DataProvider>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Home />} />
-          <Route path="post">
-            <Route index element={<NewPost />} />
-            <Route path=":id" element={<PostPage />} />
-          </Route>
-          <Route path="edit/:id" element={<EditPost />} />
-          <Route path="about" element={<About />} />
-          <Route path="*" element={<Missing />} />
-        </Route>
-      </Routes>
-    </DataProvider>
-  );
-}
 
-export default App;
+  return <DataContext.Provider value={{
+    width, search, setSearch, posts, fetchError, isLoading, handleSubmit,
+  postTitle,
+  setPostTitle,
+  postBody,
+  setPostBody, 
+  searchResults,
+  handleDelete,
+  handleEdit,
+  editBody,
+  setEditBody,
+  editTitle,
+  setEditTitle,
+  }}>{children}</DataContext.Provider>;
+};
+
+export default DataContext;
